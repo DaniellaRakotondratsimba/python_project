@@ -13,7 +13,7 @@ import praw
   
 # Reddit
 
-reddit = praw.Reddit(client_id='***identifiant***', client_secret='***motdepasse***', user_agent='***nom***')
+reddit = praw.Reddit(client_id='ehHiGyy3cmfIkYs2bemHcA', client_secret='P426UQmomD3GnchyTFlnliIFEkK13Q', user_agent='my_user_agent')
 
 subr = reddit.subreddit('Coronavirus')
 
