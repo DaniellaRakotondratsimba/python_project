@@ -31,8 +31,13 @@ class Corpus:
             docs = list(sorted(docs, key=lambda x: x.date))[:n_docs]
 
         print("\n".join(list(map(repr, docs))))
+        
+        #Voir le type de doc
+        for doc in docs:
+            print(f"Titre: {doc.titre}\tAuteur: {doc.auteur}\tDate: {doc.date}\tType: {doc.type}")
 
     def __repr__(self):
+
         docs = list(self.id2doc.values())
         docs = list(sorted(docs, key=lambda x: x.titre.lower()))
 
