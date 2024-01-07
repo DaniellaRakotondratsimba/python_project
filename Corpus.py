@@ -4,14 +4,32 @@ from Classes import Author
 
 # =============== 2.7 : CLASSE CORPUS ===============
 class Corpus:
-    def __init__(self, nom):
-        self.nom = nom
-        self.authors = {}
-        self.aut2id = {}
-        self.id2doc = {}
-        self.ndoc = 0
-        self.naut = 0
+    #Tester patron singeleton td5
+    _instance = None  # Initialisation de la variable de classe pour stocker l'unique instance
 
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Corpus, cls).__new__(cls)
+            # Nous ne réinitialisons pas ici, cela sera pris en charge par __init__
+        return cls._instance
+
+    #=========================
+    def __init__(self, nom=None):  # Allow "nom" to be optional
+        if not hasattr(self, '_initialized'): 
+            self._initialized = True
+            self.nom = nom
+            self.authors = {}
+            self.aut2id = {}
+            self.id2doc = {}
+            self.ndoc = 0
+            self.naut = 0
+    #=========================
+    @classmethod
+    def getInstance(cls):
+        if cls._instance is None:
+            raise Exception("Aucune instance de Corpus n'existe. Utilisez Corpus(nom) pour en créer une.")
+        return cls._instance
+    
     def add(self, doc):
         if doc.auteur not in self.aut2id:
             self.naut += 1
@@ -32,7 +50,7 @@ class Corpus:
 
         print("\n".join(list(map(repr, docs))))
         
-        #Voir le type de doc
+        #Voir le type de doc 
         for doc in docs:
             print(f"Titre: {doc.titre}\tAuteur: {doc.auteur}\tDate: {doc.date}\tType: {doc.type}")
 

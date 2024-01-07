@@ -84,7 +84,7 @@ longueChaineDeCaracteres = " ".join(docs)
 from Classes import Document
 
 # =============== 2.3 : MANIPS ===============
-import datetime
+"""import datetime
 collection = []
 for nature, doc in docs_bruts:
     if nature == "ArXiv":  # Les fichiers de ArXiv ou de Reddit sont pas formatés de la même manière à ce stade.
@@ -111,8 +111,46 @@ for nature, doc in docs_bruts:
 
         doc_classe = Document(titre, auteur, date, url, texte)
 
-        collection.append(doc_classe)
+        collection.append(doc_classe)"""
+#================ GENERATION DE DOCUMENT TD5 ==================
+from Classes import Document, RedditDocument, ArxivDocument
+import datetime
 
+collection = []
+# =============== FACTORY PATTERN ===============
+class DocumentFactory:
+    @staticmethod
+    def create_document(nature, doc):
+        if nature == "ArXiv":  # Les fichiers de ArXiv ou de Reddit sont pas formatés de la même manière à ce stade.
+        #showDictStruct(doc)
+
+            titre = doc["title"].replace('\n', '')  # On enlève les retours à la ligne
+            try:
+                authors = ", ".join([a["name"] for a in doc["author"]])  # On fait une liste d'auteurs, séparés par une virgule
+            except:
+                authors = doc["author"]["name"]  # Si l'auteur est seul, pas besoin de liste
+            summary = doc["summary"].replace("\n", "")  # On enlève les retours à la ligne
+            date = datetime.datetime.strptime(doc["published"], "%Y-%m-%dT%H:%M:%SZ").strftime("%Y/%m/%d")  # Formatage de la date en année/mois/jour avec librairie datetime
+
+            return ArxivDocument(titre, authors, date, doc["id"], summary)  # Création du Document
+            #collection.append(doc_classe)  # Ajout du Document à la liste.
+
+        elif nature == "Reddit":
+            titre = doc.title.replace("\n", '')
+            auteur = str(doc.author)
+            date = datetime.datetime.fromtimestamp(doc.created).strftime("%Y/%m/%d")
+            url = "https://www.reddit.com/"+doc.permalink
+            texte = doc.selftext.replace("\n", "")
+            return RedditDocument(titre, auteur, date, url, texte)
+        else:
+            raise ValueError("Nature de document non supportée.")
+
+# Utilisation du factory pour créer des objets Document
+for nature, doc in docs_bruts:
+    doc_classe = DocumentFactory.create_document(nature, doc)
+    collection.append(doc_classe)
+
+#===========================================================
 # Création de l'index de documents
 id2doc = {}
 for i, doc in enumerate(collection):
@@ -163,6 +201,8 @@ with open("corpus.pkl", "rb") as f:
 
 # La variable est réapparue
 print(corpus)
+
+
 
 
 
