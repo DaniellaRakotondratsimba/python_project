@@ -74,9 +74,6 @@ class ArxivDocument(Document):
         return "Arxiv"
     
     def __str__(self):
-        base_str = super().__str__()
-        co_authors_str = ''
-        if self.co_auteurs:  # Si la liste de co-auteurs n'est pas vide
-            co_authors_str = f"\tCo-auteurs : {', '.join(self.co_auteurs)}"
+        base_str = super().__str__()  # Appel à la méthode de la classe parent, qui inclut l'auteur principal
+        co_authors_str = "\tCo-auteurs : " + ", ".join(self.co_auteurs) if self.co_auteurs else ""
         return f"{base_str}{co_authors_str}"
-   

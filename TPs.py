@@ -124,17 +124,24 @@ class DocumentFactory:
         #showDictStruct(doc)
 
             titre = doc["title"].replace('\n', '')  # On enlève les retours à la ligne
-            try:
+            """try:
                 authors = ", ".join([a["name"] for a in doc["author"]])  # On fait une liste d'auteurs, séparés par une virgule
             except:
-                authors = doc["author"]["name"]  # Si l'auteur est seul, pas besoin de liste
+                authors = doc["author"]["name"]  # Si l'auteur est seul, pas besoin de liste"""
+            # récupérer l'auteur et les co-auteur
+            try:
+                authors_list = [a["name"] for a in doc["author"]]
+                primary_author = authors_list[0]
+                co_authors = authors_list[1:] if len(authors_list) > 1 else []
+            except TypeError:
+                primary_author = doc["author"]["name"]
+                co_authors = []
             summary = doc["summary"].replace("\n", "")  # On enlève les retours à la ligne
             date = datetime.datetime.strptime(doc["published"], "%Y-%m-%dT%H:%M:%SZ").strftime("%Y/%m/%d")  # Formatage de la date en année/mois/jour avec librairie datetime
 
-            return ArxivDocument(titre, authors, date, doc["id"], summary)  # Création du Document
-            #collection.append(doc_classe)  # Ajout du Document à la liste.
-        
-
+            #return ArxivDocument(titre, authors, date, doc["id"], summary) 
+            return ArxivDocument(titre, primary_author, date, doc["id"], summary, co_auteurs=co_authors)# Création du Document
+           
         elif nature == "Reddit":
             titre = doc.title.replace("\n", '')
             auteur = str(doc.author)
