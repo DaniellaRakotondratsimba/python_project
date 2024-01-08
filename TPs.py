@@ -40,8 +40,7 @@ for i, post in enumerate(hot_posts):
     docs.append(post.selftext.replace("\n", " "))
     docs_bruts.append(("Reddit", post))
 
-print(docs)
-
+print (docs)
 # =============== 1.2 : ArXiv ===============
 # Libraries
 import urllib, urllib.request
@@ -134,6 +133,7 @@ class DocumentFactory:
 
             return ArxivDocument(titre, authors, date, doc["id"], summary)  # Création du Document
             #collection.append(doc_classe)  # Ajout du Document à la liste.
+        
 
         elif nature == "Reddit":
             titre = doc.title.replace("\n", '')
@@ -141,7 +141,8 @@ class DocumentFactory:
             date = datetime.datetime.fromtimestamp(doc.created).strftime("%Y/%m/%d")
             url = "https://www.reddit.com/"+doc.permalink
             texte = doc.selftext.replace("\n", "")
-            return RedditDocument(titre, auteur, date, url, texte)
+            nb_commentaires = doc.num_comments
+            return RedditDocument(titre, auteur, date, url, texte, nb_commentaires)
         else:
             raise ValueError("Nature de document non supportée.")
 

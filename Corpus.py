@@ -14,7 +14,7 @@ class Corpus:
         return cls._instance
 
     #=========================
-    def __init__(self, nom=None):  # Allow "nom" to be optional
+    def __init__(self, nom=None):  # mettre le nom optionel
         if not hasattr(self, '_initialized'): 
             self._initialized = True
             self.nom = nom
@@ -52,7 +52,7 @@ class Corpus:
         
         #Voir le type de doc 
         for doc in docs:
-            print(f"Titre: {doc.titre}\tAuteur: {doc.auteur}\tDate: {doc.date}\tType: {doc.type}")
+            print(f"Titre: {doc.titre}\tAuteur: {doc.auteur}\tDate: {doc.date}\tType: {doc.getType()}")
 
     def __repr__(self):
 

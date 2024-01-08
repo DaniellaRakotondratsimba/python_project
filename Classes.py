@@ -9,16 +9,18 @@ class Document:
         self.date = date
         self.url = url
         self.texte = texte
-        self.type = doc_type  # Ajout du nouveau champ pour identifier le type de document
-
+        self.doc_type = doc_type  # Ajout du nouveau champ pour identifier le type de document
+    
+    def getType(self):
+        return self.doc_type
 # =============== 2.2 : REPRESENTATIONS ===============
     # Fonction qui renvoie le texte à afficher lorsqu'on tape repr(classe)
     def __repr__(self):
-        return f"Titre : {self.titre}\tAuteur : {self.auteur}\tDate : {self.date}\tURL : {self.url}\tTexte : {self.texte}\tType: {self.type}\t"
+        return f"Titre : {self.titre}\tAuteur : {self.auteur}\tDate : {self.date}\tURL : {self.url}\tTexte : {self.texte}\tType: {self.getType()}\t"
 
     # Fonction qui renvoie le texte à afficher lorsqu'on tape str(classe)
     def __str__(self):
-        return f"{self.titre}, par {self.auteur}"
+        return f"{self.titre}, par {self.auteur} , type: {self.getType()}"
 
 # =============== 2.4 : La classe Author ===============
 class Author:
@@ -37,7 +39,7 @@ class Author:
 # Partie 1 : class RedditDocument
 class RedditDocument(Document):
     def __init__(self, titre="", auteur="", date="", url="", texte="", nb_commentaires=0):
-        super().__init__(titre, auteur, date, url, texte, "Reddit")
+        super().__init__(titre, auteur, date, url, texte)
         self._nb_commentaires = nb_commentaires  # Utilisation de l'underscore pour indiquer un attribut protégé
 
     # Accesseur (getter) pour le nombre de commentaires
@@ -52,7 +54,11 @@ class RedditDocument(Document):
             self._nb_commentaires = valeur
         else:
             raise ValueError("Le nombre de commentaires doit être un entier positif")
-
+   
+    # Typer reddit
+    def getType(self):
+        return "Reddit"
+    
     def __str__(self):
         base = super().__str__()
         return f"{base}\tNombre de commentaires : {self._nb_commentaires}"
@@ -60,9 +66,13 @@ class RedditDocument(Document):
 # Partie 2 : classe ArxivDocument
 class ArxivDocument(Document):
     def __init__(self, titre="", auteur="", date="", url="", texte="", co_auteurs=None):
-        super().__init__(titre, auteur, date, url, texte, "Arxiv")
+        super().__init__(titre, auteur, date, url, texte)
         self.co_auteurs = co_auteurs if co_auteurs is not None else []
 
+    # Typer arxiv 
+    def getType(self):
+        return "Arxiv"
+    
     def __str__(self):
         base_str = super().__str__()
         co_authors_str = ''
