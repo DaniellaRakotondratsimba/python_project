@@ -21,5 +21,5 @@ mon_corpus.add(arxiv_doc2)
 
 # Testez l'affichage du Corpus pour vérifier que tout est en ordre.
 print(mon_corpus)  # Cela invoque __repr__ ou __str__ selon votre implémentation.
-mon_corpus.show() # Cela affiche les documents en utilisant la méthode show.
+mon_corpus.show() # Cela affiche les documents en utilisant la méthode show. 
 
