@@ -60,6 +60,34 @@ class Corpus:
         docs = list(sorted(docs, key=lambda x: x.titre.lower()))
 
         return "\n".join(list(map(str, docs)))
+    
+    # recuperation des champs d'un document pour le CSV
+    def elements_du_corpus(self):
+        natures = []
+        titres = []
+        auteurs = []
+        dates = []
+        urls = []
+        textes = []
+        co_auteurs = []
+        nb_commentaires=[]
+        for key in self.id2doc.keys():
+            natures.append(self.id2doc[key].getType())
+            titres.append(self.id2doc[key].titre)
+            auteurs.append(self.id2doc[key].auteur)
+            if(self.id2doc[key].getType() == "Reddit"):
+                co_auteurs.append("")  
+                nb_commentaires.append(self.id2doc[key].nb_commentaires)
+            else:
+                co_aut = ','.join(self.id2doc[key].co_auteurs)
+                co_auteurs.append(co_aut)
+                nb_commentaires.append("")
+            dates.append(self.id2doc[key].date)
+            urls.append(self.id2doc[key].url)
+            textes.append(self.id2doc[key].texte)
+        
+    
+        return natures,titres,auteurs,co_auteurs,nb_commentaires,dates,urls,textes
 
 
 

@@ -4,6 +4,8 @@
 # =============== 1.1 : REDDIT ===============
 # Library
 import praw
+from os import path
+import pandas as pd
 
 # Fonction affichage hiérarchie dict
 def showDictStruct(d):
@@ -194,25 +196,48 @@ for doc in collection:
 
 
 # =============== 2.9 : SAUVEGARDE ===============
-import pickle
+# Vérifier si le fichier 'corpus.csv' existe déjà
+csv_file_exists = path.exists('corpus.csv')
+pickle_file_exists = path.exists('corpus.pkl')
 
-# Ouverture d'un fichier, puis écriture avec pickle
-with open("corpus.pkl", "wb") as f:
-    pickle.dump(corpus, f)
+if not pickle_file_exists: 
+    import pickle
 
-# Supression de la variable "corpus"
-del corpus
+    # Ouverture d'un fichier, puis écriture avec pickle
+    with open("corpus.pkl", "wb") as f:
+        pickle.dump(corpus, f)
 
-# Ouverture du fichier, puis lecture avec pickle
-with open("corpus.pkl", "rb") as f:
-    corpus = pickle.load(f)
+    # Supression de la variable "corpus"
+    del corpus
 
-# La variable est réapparue
+    # Ouverture du fichier, puis lecture avec pickle
+    with open("corpus.pkl", "rb") as f:
+        corpus = pickle.load(f)
+
+    # La variable est réapparue
+    print("Corpus brut", corpus)
+
+if not csv_file_exists:
+    # Création du contenu CSV
+    nature=corpus.elements_du_corpus()[0]
+    titre=corpus.elements_du_corpus()[1]
+    Auteur=corpus.elements_du_corpus()[2]
+    Co_Auteurs=corpus.elements_du_corpus()[3]
+    nb_commentaires=corpus.elements_du_corpus()[4]
+    Date=corpus.elements_du_corpus()[5]
+    url=corpus.elements_du_corpus()[6]
+    texte=corpus.elements_du_corpus()[7]
+    
+    # Transformation des données en csv
+    df = pd.DataFrame(zip(nature,titre,Auteur,Co_Auteurs,Date,url,texte,nb_commentaires), columns=['Nature','Titre','Auteur','Co_Auteurs','Date','URL','Texte','Nb commentaires'])
+    df.to_csv(r'corpus.csv',index=False,sep=';')
+    
+    print("Creation du CSV OK")
+
+else:
+    print("Le corpus et le fichier CSV existent déjà.")
+
 print(corpus)
-
-
-
-
 
 
 
