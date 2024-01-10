@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Correction de G. Poux-Médard, 2021-2022
 # Insertion et modification code HNR TDR
 
@@ -69,8 +70,7 @@ class Corpus:
 
         return "\n".join(list(map(str, docs)))
     
-     # recuperation des champs d'un document pour le CSV
-       # recuperation des champs d'un document pour le CSV
+    # récupération des champs d'un document pour le CSV
     def elements_du_corpus(self):
         natures = []
         titres = []
@@ -101,25 +101,27 @@ class Corpus:
 # =============== ANALYSE DU CONTENU TEXTUEL TD6 ==================
     """Avec la contribution de ChatGPT"""
     # méthode de recherche utilisant des expressions régulières
-    def search(self, keyword):
-        print(f"Recherche du terme: {keyword}")
+    def search(self, keywords):
+        print(f"Recherche du terme: {type(keywords)}")
         
         if self._text_cache is None:
             self._text_cache = " ".join(doc.texte for doc in self.id2doc.values())
             print("Cache du texte construit")  
-
-        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
-        matches = pattern.finditer(self._text_cache)
         
-        results = [match.group() for match in matches]
+        patterns = [re.compile(re.escape(keyword), re.IGNORECASE) for keyword in keywords]
         
-        if results:
-            print(f"Nombre de correspondances trouvées: {len(results)}")  
+        matches = []
+        for pattern in patterns:
+            matches.extend(pattern.findall(self._text_cache))
+    
+        
+        if matches:
+            print(f"Nombre de correspondances trouvées: {len(matches)}")  
         else:
             print("Aucune correspondance trouvée")  
-        return results
+        return len(matches)
     
-    # methode de concordance pour une expression donnée
+    # méthode de concordance pour une expression donnée
     def concorde(self, expression, context_size=30):
         concordance_list = []
 
@@ -146,6 +148,10 @@ class Corpus:
 
 # ============== STATISTIQUES TD6 =====================
     def nettoyer_texte(self, texte):
+        
+        if isinstance(texte, float):
+            texte = ""
+       
         texte = texte.lower()
         texte = re.sub(r'[\n\t]', ' ', texte)  # Remplacer les retours à la ligne et les tabulations par des espaces
         texte = re.sub(r'[^a-zA-Z0-9\s]', ' ', texte)  # Retirer la ponctuation
@@ -186,7 +192,7 @@ class Corpus:
         print(freq.head(n))
 
         # Retourner le tableau freq pour utilisation future si nécessaire
-        return freq
+        return freq.head(n)
 # ============== MATRICE DOCUMENT TD7 =====================
     """Avec la contribution de ChatGPT"""
     # Créer un dictionnaire de vocabulaire
@@ -239,6 +245,9 @@ class Corpus:
 
         # Remplir les listes pour les termes de chaque document
         for doc_idx, doc in enumerate(documents):
+            if isinstance(doc.texte, float):
+                doc.texte = ""
+                
             word_counter = Counter(doc.texte.lower().split())  # S'assurer que le texte est en minuscule
             for word, count in word_counter.items():
                 if word in self.vocab:  # Vérifier si le mot est dans self.vocab
@@ -251,7 +260,7 @@ class Corpus:
                     # - Ajouter une condition pour l'ajouter au vocabulaire 
                     # - Avertir que le mot n'est pas dans le vocabulaire.
                     print(f"Le mot '{word}' n'est pas dans le vocabulaire.")
-
+                    
         # Création de la matrice TF creuse
         self.tf_matrix = csr_matrix((data, (rows, cols)), shape=(num_docs, vocab_size))
         return self.tf_matrix

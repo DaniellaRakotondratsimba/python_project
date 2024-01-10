@@ -120,6 +120,10 @@ for nature, doc in docs_bruts:
         doc_classe = Document(titre, auteur, date, url, texte)
 
         collection.append(doc_classe)"""
+
+# Manipulataion du corpus CSV
+# Completer par le TD7
+
 #================ GENERATION DE DOCUMENT TD5 ==================
 from Classes import Document, RedditDocument, ArxivDocument
 import datetime
@@ -243,9 +247,9 @@ print(corpus)
 #=============== RECHERCHE, CONCORDANCE et STATISTIQUES TD6 =================
 
 # Pour rechercher le mot-clé "..."
-results = corpus.search('year')
-for result in results:
-    print("recherche:", result)
+results = corpus.search(['year'])
+# for result in results:
+#     print("recherche:", result)
 
 # Méthode concorde pour rechercher "motif recherche"
 expression_recherchee = "from"
@@ -258,27 +262,46 @@ freq_table = corpus.stats(10)
 
 #============= MOTEUR DE RECHERCHE TD7 ====================
 
-# Construction du vocabulaire
-vocab = corpus.build_vocab()
+# # Construction du vocabulaire
+# vocab = corpus.build_vocab()
 
-# Test : Affichage des premiers éléments pour vérifier
-for word, info in list(vocab.items())[:10]:  # Modifier ce nombre pour voir plus ou moins de résultats
-    print(f"Mot: {word}, ID: {info['id']}, Occurrences totales: {info['total_occurrences']}")
+# # Test : Affichage des premiers éléments pour vérifier
+# for word, info in list(vocab.items())[:10]:  # Modifier ce nombre pour voir plus ou moins de résultats
+#     print(f"Mot: {word}, ID: {info['id']}, Occurrences totales: {info['total_occurrences']}")
 
-# Vous pouvez également tester pour un mot spécifique
-test_word = 'exemple'  # Remplacez ceci par un mot de votre choix qui est susceptible d'être dans votre corpus
-if test_word in vocab:
-    print(f"Test pour le mot '{test_word}':", vocab[test_word])
-else:
-    print(f"Le mot '{test_word}' n'est pas dans le vocabulaire.")
+# # Vous pouvez également tester pour un mot spécifique
+# test_word = 'exemple'  # Remplacez ceci par un mot de votre choix qui est susceptible d'être dans votre corpus
+# if test_word in vocab:
+#     print(f"Test pour le mot '{test_word}':", vocab[test_word])
+# else:
+#     print(f"Le mot '{test_word}' n'est pas dans le vocabulaire.")
 
-# Construction de la matrice TF
-tf_matrix = corpus.build_tf_matrix()
-#print(tf_matrix)
+# # Construction de la matrice TF
+# tf_matrix = corpus.build_tf_matrix()
+# #print(tf_matrix)
 
-# Mise à jour du vocabulaire avec le nombre total d’occurrences et le document count
-mise = corpus.update_vocab_with_doc_frequency()
+# # Mise à jour du vocabulaire avec le nombre total d’occurrences et le document count
+# mise = corpus.update_vocab_with_doc_frequency()
 
-# Construction de la matrice TFxIDF
-mat_TFxIDF = corpus.build_tfidf_matrix()
-print(mat_TFxIDF)
+# # Construction de la matrice TFxIDF
+# mat_TFxIDF = corpus.build_tfidf_matrix()
+# print(mat_TFxIDF)
+
+from tools_functions import *
+def manipulation_corpus(value_input): 
+    df = load_data('corpus.csv')
+    corpus  = Corpus() 
+     
+    
+    # Remplir corpus avec des instances de Document
+    for index, row in df.iterrows():
+        # Supposons que chaque rangée ait des colonnes nécessaires pour créer un objet Document.
+        doc = Document(titre=row['Titre'], auteur=row['Auteur'], texte=row['Texte'])
+        corpus.add(doc)
+    
+    nb_word_dans_doc = corpus.search(value_input)
+
+    top_5_frequence_mot = corpus.stats(5)
+    
+    return  nb_word_dans_doc,top_5_frequence_mot, df.iloc[:,:-1]
+# print(manipulation_corpus("rich"))

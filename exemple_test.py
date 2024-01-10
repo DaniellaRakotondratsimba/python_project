@@ -36,14 +36,14 @@ corpus.add(doc2)
 corpus.add(doc3)
 
 # Appel de la fonction search pour chercher le mot "Huawei"
-results = corpus.search("Huawei")
-
+results = corpus.search(["texte"])
+print(results)
 # Vérification et impression des résultats
 if not results:
     print("Aucun résultat trouvé.")
-else:
-    for result in results:
-        print(f"Résultat trouvé : {result}")
+# else:
+    # for result in results:
+    #     print(f"Résultat trouvé : {result}")
 
 #============== Test methode concorde =========================
 # Utilisation de la méthode concorde pour rechercher "texte"
