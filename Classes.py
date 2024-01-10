@@ -1,5 +1,5 @@
 # Correction de G. Poux-Médard, 2021-2022
-
+# Insertion et modification code HNR TDR
 # =============== 2.1 : La classe Document ===============
 class Document:
     # Initialisation des variables de la classe

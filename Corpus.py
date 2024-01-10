@@ -1,6 +1,11 @@
 # Correction de G. Poux-Médard, 2021-2022
+# Insertion et modification code HNR TDR
 
 from Classes import Author
+import re
+import pandas as pd
+from collections import Counter
+
 
 # =============== 2.7 : CLASSE CORPUS ===============
 class Corpus:
@@ -23,6 +28,7 @@ class Corpus:
             self.id2doc = {}
             self.ndoc = 0
             self.naut = 0
+            self._text_cache = None  # Cache pour la concaténation des textes
     #=========================
     @classmethod
     def getInstance(cls):
@@ -61,7 +67,8 @@ class Corpus:
 
         return "\n".join(list(map(str, docs)))
     
-    # recuperation des champs d'un document pour le CSV
+     # recuperation des champs d'un document pour le CSV
+       # recuperation des champs d'un document pour le CSV
     def elements_du_corpus(self):
         natures = []
         titres = []
@@ -87,8 +94,96 @@ class Corpus:
             textes.append(self.id2doc[key].texte)
         
     
-        return natures,titres,auteurs,co_auteurs,nb_commentaires,dates,urls,textes
+        return natures,titres,auteurs,co_auteurs,nb_commentaires,dates,urls,textes 
 
+# =============== ANALYSE DU CONTENU TEXTUEL TD6 ==================
+    """Avec la contribution de ChatGPT"""
+    # méthode de recherche utilisant des expressions régulières
+    def search(self, keyword):
+        print(f"Recherche du terme: {keyword}")
+        
+        if self._text_cache is None:
+            self._text_cache = " ".join(doc.texte for doc in self.id2doc.values())
+            print("Cache du texte construit")  
 
+        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+        matches = pattern.finditer(self._text_cache)
+        
+        results = [match.group() for match in matches]
+        
+        if results:
+            print(f"Nombre de correspondances trouvées: {len(results)}")  
+        else:
+            print("Aucune correspondance trouvée")  
+        return results
+    
+    # methode de concordance pour une expression donnée
+    def concorde(self, expression, context_size=30):
+        concordance_list = []
 
+        # Itérer sur chaque document pour construire le contexte de concordance
+        for doc_id, doc in self.id2doc.items():
+            # Préparer le pattern pour inclure le contexte
+            pattern = re.compile(f"(.{{0,{context_size}}})\\b({expression})\\b(.{{0,{context_size}}})", re.IGNORECASE)
 
+            # Trouver tous les matches avec leur contexte
+            matches = pattern.finditer(doc.texte)
+
+            # Parcourir les correspondances pour construire le concordancier
+            for match in matches:
+                contexte_gauche, motif_trouve, contexte_droit = match.groups()
+                # Nettoyage afin d'éliminer les espaces multiples créés par de nouveaux sauts de ligne ou d'espaces
+                contexte_gauche = ' '.join(contexte_gauche.split())
+                contexte_droit = ' '.join(contexte_droit.split())
+                concordance_list.append((contexte_gauche, motif_trouve, contexte_droit))
+
+        # Créer un DataFrame avec les résultats
+        concordance_df = pd.DataFrame(concordance_list, columns=['contexte gauche', 'motif trouvé', 'contexte droit'])
+
+        return concordance_df
+
+# ============== STATISTIQUES TD6 =====================
+    def nettoyer_texte(self, texte):
+        texte = texte.lower()
+        texte = re.sub(r'[\n\t]', ' ', texte)  # Remplacer les retours à la ligne et les tabulations par des espaces.
+        texte = re.sub(r'[^a-zA-Z0-9\s]', ' ', texte)  # Retirer la ponctuation.
+        texte = re.sub(r'\s+', ' ', texte)  # Remplacer de multiples espaces par un seul espace.
+        return texte.strip()
+
+    def stats(self, n):
+        vocabulaire = set()
+        word_counts = Counter()
+        doc_freq = Counter()
+
+        for doc in self.id2doc.values():
+            # Nettoyer le texte du document.
+            cleaned_text = self.nettoyer_texte(doc.texte)
+            
+            # Obtenir les mots uniques pour la document frequency.
+            mots_uniques = set(cleaned_text.split())
+            # Mettre à jour le compteur de document frequency.
+            doc_freq.update(mots_uniques)
+
+            # Construire le vocabulaire (sans doublons grâce au set).
+            vocabulaire.update(mots_uniques)            
+            
+            # Compter les occurrences de tous les mots pour term frequency.
+            word_counts.update(cleaned_text.split())
+
+        # Préparer le tableau freq avec pandas.
+        freq = pd.DataFrame(word_counts.items(), columns=['mot', 'term_frequency'])
+        # Ajout de la document frequency.
+        freq['doc_frequency'] = freq['mot'].apply(lambda x: doc_freq[x])
+
+        # Trier pour obtenir les n mots les plus fréquents.
+        freq = freq.sort_values(by='term_frequency', ascending=False)
+        
+        # Afficher le nombre de mots différents et les n mots les plus fréquents.
+        print(f"Nombre de mots différents dans le corpus : {len(vocabulaire)}")
+        print(f"Les {n} mots les plus fréquents sont:")
+        print(freq.head(n))
+
+        # Retourner le tableau freq pour utilisation future si nécessaire.
+        return freq
+    
+    

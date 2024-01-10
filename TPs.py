@@ -1,4 +1,5 @@
 # Correction de G. Poux-Médard, 2021-2022
+# Insertion et modification code HNR TDR
 
 # =============== PARTIE 1 =============
 # =============== 1.1 : REDDIT ===============
@@ -62,11 +63,17 @@ data = xmltodict.parse(data.read().decode('utf-8'))
 #showDictStruct(data)
 
 # Ajout résumés à la liste
-for i, entry in enumerate(data["feed"]["entry"]):
-    if i%10==0: print("ArXiv:", i, "/", limit)
-    docs.append(entry["summary"].replace("\n", ""))
-    docs_bruts.append(("ArXiv", entry))
-    #showDictStruct(entry)
+# Vérifie si 'entry' existe dans la réponse************
+if 'entry' in data['feed']:
+    # Si 'entry' existe
+    for i, entry in enumerate(data["feed"]["entry"]):
+        if i % 10 == 0:
+            print("ArXiv:", i, "/", limit)
+        docs.append(entry["summary"].replace("\n", " "))
+        docs_bruts.append(("ArXiv", entry))
+else:
+    # Si 'entry' n'existe pas, affichez un message et/ou prenez d'autres mesures
+    print(f"Attention : 'entry' n'est pas présent dans les données de réponse pour la requête: {url}")
 
 # =============== 1.3 : Exploitation ===============
 print(f"# docs avec doublons : {len(docs)}")
@@ -126,10 +133,6 @@ class DocumentFactory:
         #showDictStruct(doc)
 
             titre = doc["title"].replace('\n', '')  # On enlève les retours à la ligne
-            """try:
-                authors = ", ".join([a["name"] for a in doc["author"]])  # On fait une liste d'auteurs, séparés par une virgule
-            except:
-                authors = doc["author"]["name"]  # Si l'auteur est seul, pas besoin de liste"""
             # récupérer l'auteur et les co-auteur
             try:
                 authors_list = [a["name"] for a in doc["author"]]
@@ -231,13 +234,26 @@ if not csv_file_exists:
     # Transformation des données en csv
     df = pd.DataFrame(zip(nature,titre,Auteur,Co_Auteurs,Date,url,texte,nb_commentaires), columns=['Nature','Titre','Auteur','Co_Auteurs','Date','URL','Texte','Nb commentaires'])
     df.to_csv(r'corpus.csv',index=False,sep=';')
-    
-    print("Creation du CSV OK")
 
 else:
     print("Le corpus et le fichier CSV existent déjà.")
 
 print(corpus)
 
+#=============== RECHERCHE, CONCORDANCE et STATISTIQUES TD6 =================
+
+# Pour rechercher le mot-clé "..."
+results = corpus.search('year')
+for result in results:
+    print("recherche:", result)
+
+# Méthode concorde pour rechercher "motif recherche"
+expression_recherchee = "from"
+context_size = 20  # Nombre de caractères avant et après le terme pour le contexte
+concordance_results = corpus.concorde(expression_recherchee, context_size)
+print("concordance:", concordance_results)
+
+# Statistiques textuelles
+freq_table = corpus.stats(10)
 
 
