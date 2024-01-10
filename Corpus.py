@@ -5,6 +5,8 @@ from Classes import Author
 import re
 import pandas as pd
 from collections import Counter
+from scipy.sparse import csr_matrix
+import numpy as np
 
 
 # =============== 2.7 : CLASSE CORPUS ===============
@@ -185,5 +187,114 @@ class Corpus:
 
         # Retourner le tableau freq pour utilisation future si nécessaire.
         return freq
+# ============== MATRICE DOCUMENT TD7 =====================
+    """Avec la contribution de ChatGPT"""
+    # Créer un dictionnaire de vocabulaire
+    def build_vocab(self):
+        vocab = {}
+        word_id = 0
+
+        # Boucler sur tous les documents pour construire le vocabulaire
+        for doc in self.id2doc.values():
+            cleaned_text = self.nettoyer_texte(doc.texte)
+            words = set(cleaned_text.split())
+
+            for word in words:
+                if word not in vocab:
+                    vocab[word] = {
+                        'id': word_id,
+                        'total_occurrences': 0  # Cette valeur sera mise à jour plus tard
+                    }
+                    word_id += 1
+        
+        # Trier le vocabulaire par ordre alphabétique des mots
+        vocab = dict(sorted(vocab.items()))
+
+        # Maintenant, calculons les occurrences totales pour chaque mot
+        for doc in self.id2doc.values():
+            cleaned_text = self.nettoyer_texte(doc.texte)
+            words = cleaned_text.split()
+
+            for word in words:
+                if word in vocab:  # Assurez-vous que le mot est dans le vocab
+                    vocab[word]['total_occurrences'] += 1
+
+        self.vocab = vocab
+        
+        return vocab
+    
+    # Créer matrice Term Frequency (TF)
+    def build_tf_matrix(self):
+        # S'assurer que le vocabulaire est à jour
+        self.build_vocab()
+
+        # Préparer les données pour construire la matrice creuse
+        documents = list(self.id2doc.values())
+        num_docs = len(documents)
+        vocab_size = len(self.vocab)
+        # Row, Column et Value pour construire la matrice creuse
+        rows = []
+        cols = []
+        data = []
+
+        # Remplir les listes pour les termes de chaque document
+        for doc_idx, doc in enumerate(documents):
+            word_counter = Counter(doc.texte.lower().split())  # S'assurer que le texte est en minuscule.
+            for word, count in word_counter.items():
+                if word in self.vocab:  # Vérifier si le mot est dans self.vocab
+                    word_idx = self.vocab[word]['id']  # Index du mot dans la matrice (col)
+                    rows.append(doc_idx)  # Index du document dans la matrice (row)
+                    cols.append(word_idx)
+                    data.append(count)  # Nombre d'occurrences du mot dans le document (data)
+                else:
+                    # Gérer le cas oú le mot n'est pas trouvé. Par exemple : 
+                    # - Ajouter une condition pour l'ajouter au vocabulaire 
+                    # - Avertir que le mot n'est pas dans le vocabulaire.
+                    print(f"Le mot '{word}' n'est pas dans le vocabulaire.")
+
+        # Création de la matrice TF creuse
+        self.tf_matrix = csr_matrix((data, (rows, cols)), shape=(num_docs, vocab_size))
+        return self.tf_matrix
+    
+    # calculer le nombre total d’occurrences
+    def update_vocab_with_doc_frequency(self):
+        if not hasattr(self, 'tf_matrix'):
+            raise Exception("La matrice TF n'a pas été construite.")
+        
+        # Calcul du nombre de documents contenant chaque mot
+        binary_matrix = self.tf_matrix.copy()
+        binary_matrix.data = np.ones_like(self.tf_matrix.data)
+        doc_count = binary_matrix.sum(axis=0)
+
+        # Mise à jour de vocab avec le nombre total d’occurrences et le document count
+        for word, value in self.vocab.items():
+            word_id = value['id']
+            value['doc_count'] = doc_count[0, word_id]  # Le nombre de documents où le mot apparait
+            value['total_occurrences'] = self.tf_matrix[:, word_id].sum()  # La somme des occurrences dans tous les documents
+        
+        return self.vocab  # Retourner le dictionnaire vocab mis à jour
+    
+    # calculer la 2e matrice mat_TFxIDF
+    def build_tfidf_matrix(self):
+        # Si le vocabulaire ou la matrice TF n'est pas encore créé, le créer
+        if not hasattr(self, 'tf_matrix'):
+            self.build_tf_matrix()
+
+        # Nombre total de documents dans le corpus
+        num_docs = self.tf_matrix.shape[0] 
+
+        # Calculer l'IDF pour chaque terme dans vocab
+        # IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
+        idfs = []
+        for term_info in self.vocab.values():
+            term_idf = np.log(num_docs / (1 + term_info['doc_count']))  # +1 pour éviter la division par zéro
+            idfs.append(term_idf)
+        idfs = np.array(idfs)
+
+        # Créer la matrice TFxIDF en multipliant les éléments de TF par leurs idfs correspondants
+        # Pour cela nous devons aligner idfs à être une matrice diagonale pour la multiplication
+        self.mat_TFxIDF = self.tf_matrix.multiply(idfs)
+        
+        return self.mat_TFxIDF
     
     

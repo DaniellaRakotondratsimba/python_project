@@ -57,3 +57,18 @@ print("concordance:", concordance_results)
 
 #============== Test methode stats =========================
 freq_table = corpus.stats(3)
+
+#============== Test methode build_vocab =========================
+# Construction du vocabulaire
+vocab = corpus.build_vocab()
+
+# Test : Affichage des premiers éléments pour vérifier
+for word, info in list(vocab.items())[:10]:  # Modifier ce nombre pour voir plus ou moins de résultats
+    print(f"Mot: {word}, ID: {info['id']}, Occurrences totales: {info['total_occurrences']}")
+
+# Vous pouvez également tester pour un mot spécifique
+test_word = 'exemple'  # Remplacez ceci par un mot de votre choix qui est susceptible d'être dans votre corpus
+if test_word in vocab:
+    print(f"Test pour le mot '{test_word}':", vocab[test_word])
+else:
+    print(f"Le mot '{test_word}' n'est pas dans le vocabulaire.")

@@ -256,4 +256,30 @@ print("concordance:", concordance_results)
 # Statistiques textuelles
 freq_table = corpus.stats(10)
 
+#============= MOTEUR DE RECHERCHE TD7 ====================
+
+# Construction du vocabulaire
+vocab = corpus.build_vocab()
+
+# Test : Affichage des premiers éléments pour vérifier
+for word, info in list(vocab.items())[:10]:  # Modifier ce nombre pour voir plus ou moins de résultats
+    print(f"Mot: {word}, ID: {info['id']}, Occurrences totales: {info['total_occurrences']}")
+
+# Vous pouvez également tester pour un mot spécifique
+test_word = 'exemple'  # Remplacez ceci par un mot de votre choix qui est susceptible d'être dans votre corpus
+if test_word in vocab:
+    print(f"Test pour le mot '{test_word}':", vocab[test_word])
+else:
+    print(f"Le mot '{test_word}' n'est pas dans le vocabulaire.")
+
+# Construction de la matrice TF
+tf_matrix = corpus.build_tf_matrix()
+#print(tf_matrix)
+
+# Mise à jour du vocabulaire avec le nombre total d’occurrences et le document count
+mise = corpus.update_vocab_with_doc_frequency()
+
+# Construction de la matrice TFxIDF
+mat_TFxIDF = corpus.build_tfidf_matrix()
+print(mat_TFxIDF)
 
