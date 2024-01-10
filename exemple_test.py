@@ -3,7 +3,7 @@
 from Classes import Document, RedditDocument, ArxivDocument
 from Corpus import Corpus
 
-# Crée des instances de RedditDocument et ArxivDocument.
+# Crée des instances de RedditDocument et ArxivDocument
 reddit_doc1 = RedditDocument(titre="Reddit Post 1", auteur="redditor1", date="2023-01-01", url="http://reddit.com/r/example1", texte="Example text 1", nb_commentaires=10)
 reddit_doc2 = RedditDocument(titre="Reddit Post 2", auteur="redditor2", date="2023-02-01", url="http://reddit.com/r/example2", texte="Example text 2", nb_commentaires=20)
 
@@ -20,8 +20,8 @@ mon_corpus.add(arxiv_doc1)
 mon_corpus.add(arxiv_doc2)
 
 # Teste l'affichage du Corpus pour vérifier que tout est en ordre.
-print(mon_corpus)  # Cela invoque __repr__ ou __str__ selon votre implémentation.
-mon_corpus.show() # Cela affiche les documents en utilisant la méthode show. 
+print(mon_corpus)  # Cela invoque __repr__ ou __str__ selon votre implémentation
+mon_corpus.show() # Cela affiche les documents en utilisant la méthode show
 
 #============== Test methode search =========================
 # Création d'instances de Document avec du texte à rechercher
@@ -71,4 +71,4 @@ test_word = 'exemple'  # Remplacez ceci par un mot de votre choix qui est suscep
 if test_word in vocab:
     print(f"Test pour le mot '{test_word}':", vocab[test_word])
 else:
-    print(f"Le mot '{test_word}' n'est pas dans le vocabulaire.")
+    print(f"Le mot '{test_word}' n'est pas dans le vocabulaire.") 

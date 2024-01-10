@@ -282,4 +282,3 @@ mise = corpus.update_vocab_with_doc_frequency()
 # Construction de la matrice TFxIDF
 mat_TFxIDF = corpus.build_tfidf_matrix()
 print(mat_TFxIDF)
-

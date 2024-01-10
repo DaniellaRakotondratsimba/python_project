@@ -147,9 +147,9 @@ class Corpus:
 # ============== STATISTIQUES TD6 =====================
     def nettoyer_texte(self, texte):
         texte = texte.lower()
-        texte = re.sub(r'[\n\t]', ' ', texte)  # Remplacer les retours à la ligne et les tabulations par des espaces.
-        texte = re.sub(r'[^a-zA-Z0-9\s]', ' ', texte)  # Retirer la ponctuation.
-        texte = re.sub(r'\s+', ' ', texte)  # Remplacer de multiples espaces par un seul espace.
+        texte = re.sub(r'[\n\t]', ' ', texte)  # Remplacer les retours à la ligne et les tabulations par des espaces
+        texte = re.sub(r'[^a-zA-Z0-9\s]', ' ', texte)  # Retirer la ponctuation
+        texte = re.sub(r'\s+', ' ', texte)  # Remplacer de multiples espaces par un seul espace
         return texte.strip()
 
     def stats(self, n):
@@ -158,18 +158,18 @@ class Corpus:
         doc_freq = Counter()
 
         for doc in self.id2doc.values():
-            # Nettoyer le texte du document.
+            # Nettoyer le texte du document
             cleaned_text = self.nettoyer_texte(doc.texte)
             
-            # Obtenir les mots uniques pour la document frequency.
+            # Obtenir les mots uniques pour la document frequency
             mots_uniques = set(cleaned_text.split())
-            # Mettre à jour le compteur de document frequency.
+            # Mettre à jour le compteur de document frequency
             doc_freq.update(mots_uniques)
 
-            # Construire le vocabulaire (sans doublons grâce au set).
+            # Construire le vocabulaire (sans doublons grâce au set)
             vocabulaire.update(mots_uniques)            
             
-            # Compter les occurrences de tous les mots pour term frequency.
+            # Compter les occurrences de tous les mots pour term frequency
             word_counts.update(cleaned_text.split())
 
         # Préparer le tableau freq avec pandas.
@@ -180,12 +180,12 @@ class Corpus:
         # Trier pour obtenir les n mots les plus fréquents.
         freq = freq.sort_values(by='term_frequency', ascending=False)
         
-        # Afficher le nombre de mots différents et les n mots les plus fréquents.
+        # Afficher le nombre de mots différents et les n mots les plus fréquents
         print(f"Nombre de mots différents dans le corpus : {len(vocabulaire)}")
         print(f"Les {n} mots les plus fréquents sont:")
         print(freq.head(n))
 
-        # Retourner le tableau freq pour utilisation future si nécessaire.
+        # Retourner le tableau freq pour utilisation future si nécessaire
         return freq
 # ============== MATRICE DOCUMENT TD7 =====================
     """Avec la contribution de ChatGPT"""
@@ -239,7 +239,7 @@ class Corpus:
 
         # Remplir les listes pour les termes de chaque document
         for doc_idx, doc in enumerate(documents):
-            word_counter = Counter(doc.texte.lower().split())  # S'assurer que le texte est en minuscule.
+            word_counter = Counter(doc.texte.lower().split())  # S'assurer que le texte est en minuscule
             for word, count in word_counter.items():
                 if word in self.vocab:  # Vérifier si le mot est dans self.vocab
                     word_idx = self.vocab[word]['id']  # Index du mot dans la matrice (col)
@@ -284,7 +284,7 @@ class Corpus:
         num_docs = self.tf_matrix.shape[0] 
 
         # Calculer l'IDF pour chaque terme dans vocab
-        # IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
+        # IDF(t) = log_e(Total number of documents / Number of documents with term t in it)
         idfs = []
         for term_info in self.vocab.values():
             term_idf = np.log(num_docs / (1 + term_info['doc_count']))  # +1 pour éviter la division par zéro
